@@ -18,14 +18,14 @@ A simple python3 wifi monitor that utilizes [nmap](https://nmap.org) and AT&T's 
 ## Instructions
 
 1. Clone this repository
-2. In keys.txt replace <MASTER_API_KEY>
+2. In keys.txt replace `<MASTER_API_KEY>`
 with your master api key. [Here's a direct link](https://m2x.att.com/account#master-keys).
 
-3. Run master.py on your machine ()
+3. Run master.py on your machine
 
-    '''bash
+    ```bash
     $ sudo python3 master.py
-    '''
+    ```
 
 4. Look at the device on m2x and you should see that data about your local wifi network!
 
