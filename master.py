@@ -27,7 +27,7 @@ scanner = Scanner()
 controller = Controller(CLIENT, DEVICE_NAME, non_numeric_stream, *numeric_streams)
 
 while True:
-    print('Beginning scan and stream update')
+    print('Beginning scan')
     controller.update_all(scanner)
-    print('Finished scan and update... waiting 1 minute')
+    print('Finished... waiting 60 seconds')
     time.sleep(60)

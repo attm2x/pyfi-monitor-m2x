@@ -26,9 +26,11 @@ class Scanner(object):
         self.unknown = 0
         self.known = 0
         self.total = 0
+        self.previous_total = 0
         self.macs = None
 
     def scan(self):
+        self.previous_total = self.total
         self.simple_scan()
         self.scanned = True
         self.total = self._connections()
@@ -79,16 +81,24 @@ class Controller(object):
         self.num_macs, self.num_connects, self.num_unknowns = self._get_streams(*numeric_names)
 
     def update_all(self, scanner):
+        # Perform the scan
         scanner.scan()
-        posttime = datetime.now()
 
-        values = {self.mac_addresses.name: [{'timestamp': posttime, 'value': scanner.get_macs_string()}],
-                  self.num_macs.name: [{'timestamp': posttime, 'value': scanner.known}],
-                  self.num_unknowns.name: [{'timestamp': posttime, 'value': scanner.unknown}],
-                  self.num_connects.name: [{'timestamp': posttime, 'value': scanner.total}]
-                  }
+        # If the number of connections changes, update the stream.
+        if scanner.previous_total != scanner.total:
+            print('Updating stream')
+            posttime = datetime.now()
 
-        self.device.post_updates(values=values)
+            values = {self.mac_addresses.name: [{'timestamp': posttime, 'value': scanner.get_macs_string()}],
+                      self.num_macs.name: [{'timestamp': posttime, 'value': scanner.known}],
+                      self.num_unknowns.name: [{'timestamp': posttime, 'value': scanner.unknown}],
+                      self.num_connects.name: [{'timestamp': posttime, 'value': scanner.total}]
+                      }
+
+            self.device.post_updates(values=values)
+            print('Scan and update complete')
+        else:
+            print('Stream update not required')
 
     def _get_device(self, devicename):
         try:
