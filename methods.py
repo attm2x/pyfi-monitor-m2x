@@ -8,12 +8,16 @@ from datetime import datetime
 from nmap import PortScanner
 from requests.exceptions import HTTPError
 from m2x.client import M2XClient
+import netifaces
 
 def get_ip():
     '''
-    Find the local IP to be scanned
+    Find the local IP to be scanned. Utilize netifaces to be platform independent.
     '''
-    return socket.gethostbyname(socket.gethostname())
+    gws = netifaces.gateways()
+    addresses = netifaces.ifaddresses(gws['default'][netifaces.AF_INET][1])
+    return addresses[netifaces.AF_INET][0]['addr']
+
 
 class Scanner(object):
     '''
