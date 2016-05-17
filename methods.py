@@ -2,6 +2,9 @@
 
 import socket
 import re
+import json
+import collections
+import logging
 from uuid import getnode as get_mac
 from datetime import datetime
 
@@ -9,6 +12,8 @@ from nmap import PortScanner
 from requests.exceptions import HTTPError
 from m2x.client import M2XClient
 import netifaces
+
+logger = logging.getLogger('pyfi.methods')
 
 def get_ip():
     '''
@@ -31,33 +36,39 @@ class Scanner(object):
         self.known = 0
         self.total = 0
         self.previous_total = 0
-        self.macs = None
+        self.previous_scan_mac_vendors = []
+        self.mac_vendors = None
 
     def scan(self):
-        self.previous_total = self.total
+        self.previous_scan_mac_vendors = self.mac_vendors
         self.simple_scan()
         self.scanned = True
         self.total = self._connections()
-        self.macs = self._macs()
-        self.known = len(self.macs)
+        self.mac_vendors = self._mac_vendors()
+        self.known = len(self.mac_vendors)
         self.unknown = self.total - self.known
 
     def simple_scan(self):
-        self.nmap.scan(hosts=self.ip+'/24', arguments='-n -sP -PE -PA21,23,80,3389')
+        self.nmap.scan(hosts=self.ip+'/24', arguments='-n -sn -PE -PA21,23,80,3389')
 
-    def _macs(self):
+    def _mac_vendors(self):
         if not self.scanned:
             self.simple_scan()
 
-        macs = {host: self.nmap[host]['addresses'].get('mac', None) for host in self.nmap.all_hosts()}
+        hosts = self.nmap.all_hosts()
+
+        macs = {host: self.nmap[host]['addresses'].get('mac', None) for host in hosts}
+        mac_vendors = [(host, mac, vendor) for host in hosts for mac, vendor in self.nmap[host]['vendor'].items()]
+
+        logger.debug("Scanner._mac_vendors() - macs: %s\n mac_vendors: %s" % (macs, mac_vendors))
         
         #nmap often doesn't produce current device MAC address
         if not macs[self.ip]:
-            macs[self.ip] = ":".join(re.findall('..', '%012x' % get_mac())).upper()
+            mac_vendors.append((self.ip, ":".join(re.findall('..', '%012x' % get_mac())).upper(), None))
 
         # After checking the local device IP, any more connections missing MACS are unknown
-        known_macs = [value for value in macs.values() if value]
-        return known_macs
+        # known_macs = [value for value in macs.values() if value]
+        return mac_vendors
 
     def _connections(self):
         try:
@@ -66,13 +77,11 @@ class Scanner(object):
             self.simple_scan()
             return int(self.nmap.scanstats()['uphosts'])
 
-
-    def get_macs_string(self):
+    def get_mac_vendors_json(self):
         if self.scanned:
-            return ", ".join(self.macs)
+            return json.dumps(self.mac_vendors)
         self.scan()
-        return ", ".join(self.macs)
-
+        return json.dumps(self.mac_vendors)
 
 class Controller(object):
     '''
@@ -89,20 +98,21 @@ class Controller(object):
         scanner.scan()
 
         # If the number of connections changes, update the stream.
-        if scanner.previous_total != scanner.total:
-            print('Updating stream')
+        if collections.Counter(scanner.previous_scan_mac_vendors) != collections.Counter(scanner.mac_vendors):
+            logger.info('Updating stream')
             posttime = datetime.now()
 
-            values = {self.mac_addresses.name: [{'timestamp': posttime, 'value': scanner.get_macs_string()}],
+            values = {self.mac_addresses.name: [{'timestamp': posttime, 'value': scanner.get_mac_vendors_json()}],
                       self.num_macs.name: [{'timestamp': posttime, 'value': scanner.known}],
                       self.num_unknowns.name: [{'timestamp': posttime, 'value': scanner.unknown}],
                       self.num_connects.name: [{'timestamp': posttime, 'value': scanner.total}]
                       }
+            logger.debug("Controller.update_all() - values: %s\n " % values)
 
             self.device.post_updates(values=values)
-            print('Scan and update complete')
+            logger.info('Scan and update complete')
         else:
-            print('Stream update not required')
+            logger.info('Stream update not required')
 
     def _get_device(self, devicename):
         try:
