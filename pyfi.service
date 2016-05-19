@@ -1,0 +1,18 @@
+[Unit]
+Description=PyFi Service
+After=multi-user.target
+
+[Service]
+Type=idle
+# ExecStart requires the first argument to be the absolute path to the python
+# executable you wish to use.  Use /usr/local/bin/python3 if you're using the
+# system install of python. If you are using virtualenv it should be similar
+# to /home/pi/.virtualenvs/pyfi/bin/python. The second argument should be
+# the absolute path to where you've installed the PyFi main script, master.py.
+# The default is given below. 
+ExecStart=/usr/local/bin/python3 /home/pi/pyfi-monitor-m2x/master.py
+WorkingDirectory=/home/pi/pyfi-monitor-m2x
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
