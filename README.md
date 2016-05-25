@@ -1,5 +1,5 @@
 # PyFi
-A Python 3 based network monitor that utilizes [nmap](https://nmap.org) to report devices connected to a local network and sends that information to AT&T's [M2X](https://m2x.att.com).
+A Python 3 based network monitor that utilizes [nmap](https://nmap.org) to report devices connected to a local network and sends that information to [AT&T M2X](https://m2x.att.com).
 
 See https://pyfi.herokuapp.com to see PyFi data being displayed by the [PyFi-Web demo](https://github.com/sterlzbd/pyfi-monitor-web) flask application.
 
