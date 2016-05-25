@@ -11,6 +11,7 @@ See https://pyfi.herokuapp.com to see PyFi data being displayed by the [PyFi-Web
 ## Dependencies
 
 * Python3 running on your chosen machine
+* `pip3` for installing Python 3 version of packages
 * [nmap](https://nmap.org) installed on your machine - written for v6.01+
 * Python packages outlined in [requirements.txt](requirements.txt)
 
@@ -20,14 +21,14 @@ See https://pyfi.herokuapp.com to see PyFi data being displayed by the [PyFi-Web
 2. In [keys.txt](keys.txt) replace `<MASTER_API_KEY>` with your master api key. You can obtain your Master API Key from your M2X [Account Settings](https://m2x.att.com/account#master-keys).
 3. Install dependencies:
     ```bash
-    $ sudo apt-get install nmap
+    $ sudo apt-get update; sudo apt-get install -y python3 nmap python3-pip
     ```
 
     ```bash
     $ pip3 install -r requirements.txt
     ```
 
-4. Run master.py on your machine
+4. From within the PyFi root folder run:
 
     ```bash
     $ sudo python3 master.py
