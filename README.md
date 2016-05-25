@@ -12,16 +12,12 @@ See https://pyfi.herokuapp.com to see PyFi data being displayed by the [PyFi-Web
 
 * Python3 running on your chosen machine
 * [nmap](https://nmap.org) installed on your machine - written for v6.01+
-* [m2x-python](https://github.com/attm2x/m2x-python) - written for v4.0.0+
-* [python-nmap](https://pypi.python.org/pypi/python-nmap) - written for v0.3.4+
-* [netifaces](https://pypi.python.org/pypi/netifaces) - written for v0.10.4
-
+* Python packages outlined in [requirements.txt](requirements.txt)
 
 ## Instructions
 
 1. Clone this repository
-2. In keys.txt replace `<MASTER_API_KEY>`
-with your master api key. [Here's a direct link](https://m2x.att.com/account).
+2. In [keys.txt](keys.txt) replace `<MASTER_API_KEY>` with your master api key. You can obtain your Master API Key from your M2X [Account Settings](https://m2x.att.com/account#master-keys).
 3. Install dependencies:
     ```bash
     $ sudo apt-get install nmap
@@ -39,7 +35,7 @@ with your master api key. [Here's a direct link](https://m2x.att.com/account).
 
 5. Log in to M2X, access your device, and you will see data about your local wifi network!
 
-** If something does go wrong, check errors.log in the directory containing master.py (/home/pi/pyfi-monitor-m2x/)
+** If something does go wrong, check errors.log in the directory containing master.py
 
 ## Optional: Run as a service using systemd
 
@@ -67,7 +63,6 @@ Then follow these steps:
     ```
 4. Now PyFi will automatically start when your machine boots or manually start it using `sudo systemctl start pyfi`.
 You can check on it's status with `sudo systemctl status pyfi` and stop it with `sudo systemctl stop pyfi`.
-
 
 ## Troubleshooting
 
