@@ -35,7 +35,7 @@ logger = logging.getLogger('pyfi')
 
 # Get M2X Master API Key from keys.txt
 with open('keys.txt', 'r') as f:
-    APIKEY = f.readline()
+    APIKEY = f.readline().strip('\n')
 
 DEVICE_NAME = 'rpi-network-monitor'
 
