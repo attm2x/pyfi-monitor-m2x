@@ -142,7 +142,7 @@ class Controller(object):
         except IndexError:
             device = self.client.create_device(name=devicename,
                                                description="Local Network"
-                                                           "Monitor",
+                                                           " Monitor",
                                                visibility="private")
         return device
 
